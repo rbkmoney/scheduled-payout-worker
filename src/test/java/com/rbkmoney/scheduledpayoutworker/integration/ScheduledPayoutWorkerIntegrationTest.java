@@ -17,6 +17,7 @@ import com.rbkmoney.scheduledpayoutworker.integration.config.TestKafkaConfig;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import lombok.SneakyThrows;
 import org.awaitility.Awaitility;
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,9 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.time.Duration;

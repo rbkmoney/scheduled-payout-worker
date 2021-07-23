@@ -17,10 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class ShopMetaDaoTest extends AbstractPostgreTestContainerConfig {
 
     @Autowired
-    private ShopMetaDao shopMetaDao;
-
-    @Autowired
     TransactionTemplate transactionTemplate;
+    @Autowired
+    private ShopMetaDao shopMetaDao;
 
     @Test
     void testSaveAndGetShopMeta() {
