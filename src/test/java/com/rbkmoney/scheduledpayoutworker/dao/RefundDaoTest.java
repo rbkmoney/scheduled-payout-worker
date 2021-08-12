@@ -18,15 +18,13 @@ class RefundDaoTest extends AbstractPostgreTestContainerConfig {
     RefundDao refundDao;
 
     @Test
-    void testSaveAndGet() throws DaoException {
+    void testSave() throws DaoException {
         Refund refund = random(Refund.class, "payoutId");
         refundDao.save(refund);
 
         Refund secondRefund = new Refund(refund);
         secondRefund.setId(null);
         refundDao.save(secondRefund);
-
-        assertEquals(refund, refundDao.get(refund.getInvoiceId(), refund.getPaymentId(), refund.getRefundId()));
     }
 
     @Test

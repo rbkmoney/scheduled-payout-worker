@@ -78,7 +78,7 @@ public class PaymentDaoImpl extends AbstractGenericDao implements PaymentDao {
                 .set(PAYMENT.CAPTURED_AT, capturedAt)
                 .where(PAYMENT.INVOICE_ID.eq(invoiceId).and(PAYMENT.PAYMENT_ID.eq(paymentId)));
 
-        executeOne(query);
+        execute(query);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class PaymentDaoImpl extends AbstractGenericDao implements PaymentDao {
                                 .and(PAYMENT.PAYOUT_ID.isNull())
                 );
 
-        executeOne(query);
+        execute(query);
     }
 
 }

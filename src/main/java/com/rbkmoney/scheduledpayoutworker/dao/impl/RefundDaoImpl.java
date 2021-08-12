@@ -41,16 +41,6 @@ public class RefundDaoImpl extends AbstractGenericDao implements RefundDao {
     }
 
     @Override
-    public Refund get(String invoiceId, String paymentId, String refundId) throws DaoException {
-        Query query = getDslContext().selectFrom(REFUND)
-                .where(REFUND.INVOICE_ID.eq(invoiceId)
-                        .and(REFUND.PAYMENT_ID.eq(paymentId))
-                        .and(REFUND.REFUND_ID.eq(refundId)));
-
-        return fetchOne(query, refundRowMapper);
-    }
-
-    @Override
     public void markAsSucceeded(long eventId, String invoiceId, String paymentId, String refundId,
                                 LocalDateTime succeededAt) throws DaoException {
         Query query = getDslContext().update(REFUND)
@@ -59,7 +49,7 @@ public class RefundDaoImpl extends AbstractGenericDao implements RefundDao {
                 .where(REFUND.INVOICE_ID.eq(invoiceId)
                         .and(REFUND.PAYMENT_ID.eq(paymentId)
                                 .and(REFUND.REFUND_ID.eq(refundId))));
-        executeOne(query);
+        execute(query);
     }
 
     @Override
@@ -90,13 +80,4 @@ public class RefundDaoImpl extends AbstractGenericDao implements RefundDao {
                 );
         return execute(query);
     }
-
-    @Override
-    public int excludeFromPayout(String payoutId) throws DaoException {
-        Query query = getDslContext().update(REFUND)
-                .set(REFUND.PAYOUT_ID, (String) null)
-                .where(REFUND.PAYOUT_ID.eq(payoutId));
-        return execute(query);
-    }
-
 }

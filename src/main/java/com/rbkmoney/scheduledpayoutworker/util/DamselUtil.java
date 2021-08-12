@@ -73,4 +73,9 @@ public class DamselUtil {
         return claimStatus;
     }
 
+    public static boolean isClaimAccepted(PartyChange change) {
+        ClaimStatus claimStatus = getClaimStatus(change);
+        return claimStatus != null && claimStatus.isSetAccepted();
+    }
+
 }

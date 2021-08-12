@@ -8,14 +8,12 @@ import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.scheduledpayoutworker.dao.ShopMetaDao;
 import com.rbkmoney.scheduledpayoutworker.poller.handler.PartyManagementHandler;
 import com.rbkmoney.scheduledpayoutworker.service.PartyManagementService;
+import com.rbkmoney.scheduledpayoutworker.util.DamselUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-import static com.rbkmoney.scheduledpayoutworker.util.DamselUtil.getClaimStatus;
-import static com.rbkmoney.scheduledpayoutworker.util.DamselUtil.hasPaymentInstitutionAccountPayTool;
 
 @Slf4j
 @Component
@@ -27,12 +25,12 @@ public class ShopPayoutToolChangedHandler implements PartyManagementHandler {
 
     @Override
     public boolean accept(PartyChange partyChange) {
-        return getClaimStatus(partyChange).isSetAccepted();
+        return DamselUtil.isClaimAccepted(partyChange);
     }
 
     @Override
     public void handle(PartyChange change, MachineEvent event) {
-        List<ClaimEffect> claimEffects = getClaimStatus(change).getAccepted().getEffects();
+        List<ClaimEffect> claimEffects = DamselUtil.getClaimStatus(change).getAccepted().getEffects();
         for (ClaimEffect claimEffect : claimEffects) {
             if (claimEffect.isSetShopEffect() && claimEffect.getShopEffect().getEffect().isSetPayoutToolChanged()) {
                 handleEvent(event, claimEffect);
@@ -50,7 +48,7 @@ public class ShopPayoutToolChangedHandler implements PartyManagementHandler {
         Party party = partyManagementService.getParty(partyId);
         Shop shop = party.getShops().get(shopId);
         boolean hasPaymentInstitutionAccPayTool =
-                hasPaymentInstitutionAccountPayTool(party, shop.getContractId(), changedPayoutToolId);
+                DamselUtil.hasPaymentInstitutionAccountPayTool(party, shop.getContractId(), changedPayoutToolId);
 
         if (hasPaymentInstitutionAccPayTool || shopMetaDao.get(partyId, shopId) != null) {
             shopMetaDao.save(partyId, shopId, hasPaymentInstitutionAccPayTool);

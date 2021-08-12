@@ -5,14 +5,13 @@ import com.rbkmoney.damsel.payment_processing.*;
 import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import com.rbkmoney.scheduledpayoutworker.poller.handler.PartyManagementHandler;
 import com.rbkmoney.scheduledpayoutworker.service.SchedulatorService;
+import com.rbkmoney.scheduledpayoutworker.util.DamselUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.rbkmoney.scheduledpayoutworker.util.DamselUtil.getClaimStatus;
 
 @Component
 @RequiredArgsConstructor
@@ -22,14 +21,14 @@ public class PartyClaimCreatedHandler implements PartyManagementHandler {
 
     @Override
     public boolean accept(PartyChange change) {
-        return getClaimStatus(change).isSetAccepted();
+        return DamselUtil.isClaimAccepted(change);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handle(PartyChange change, MachineEvent event) {
         String partyId = event.getSourceId();
-        List<ClaimEffect> claimEffects = getClaimStatus(change)
+        List<ClaimEffect> claimEffects = DamselUtil.getClaimStatus(change)
                 .getAccepted()
                 .getEffects();
 
