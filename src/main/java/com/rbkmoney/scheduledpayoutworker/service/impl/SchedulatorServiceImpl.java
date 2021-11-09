@@ -4,10 +4,7 @@ import com.rbkmoney.damsel.domain.BusinessScheduleRef;
 import com.rbkmoney.damsel.domain.CalendarRef;
 import com.rbkmoney.damsel.domain.PaymentInstitution;
 import com.rbkmoney.damsel.domain.Shop;
-import com.rbkmoney.damsel.schedule.DominantBasedSchedule;
-import com.rbkmoney.damsel.schedule.RegisterJobRequest;
-import com.rbkmoney.damsel.schedule.SchedulatorSrv;
-import com.rbkmoney.damsel.schedule.Schedule;
+import com.rbkmoney.damsel.schedule.*;
 import com.rbkmoney.payouter.domain.tables.pojos.ShopMeta;
 import com.rbkmoney.scheduledpayoutworker.dao.ShopMetaDao;
 import com.rbkmoney.scheduledpayoutworker.exception.NotFoundException;
@@ -56,7 +53,11 @@ public class SchedulatorServiceImpl implements SchedulatorService {
                     "partyId='%s', shopId='%s', contractId='%s'", partyId, shop.getId(), shop.getContractId()));
         }
 
-        deregisterJob(partyId, shopId);
+        try {
+            deregisterJob(partyId, shopId);
+        } catch (IllegalStateException e) {
+            log.info("Job not found, so we couldn't deregister it");
+        }
 
         CalendarRef calendarRef = paymentInstitution.getCalendar();
 
