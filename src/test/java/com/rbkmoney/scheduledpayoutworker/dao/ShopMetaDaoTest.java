@@ -42,8 +42,6 @@ class ShopMetaDaoTest extends AbstractPostgreTestContainerConfig {
         assertEquals(2, (int) shopMeta.getCalendarId());
         assertEquals(1, (int) shopMeta.getSchedulerId());
 
-        shopMetaDao.update("test2", "test2", 2, 1, "ccc");
-
         shopMetaDao.disableShop(partyId, shopId);
         shopMeta = shopMetaDao.get(partyId, shopId);
         assertEquals(partyId, shopMeta.getPartyId());
