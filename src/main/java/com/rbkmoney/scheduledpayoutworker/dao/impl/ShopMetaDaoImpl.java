@@ -27,12 +27,6 @@ public class ShopMetaDaoImpl extends AbstractGenericDao implements ShopMetaDao {
         shopMetaRowMapper = new RecordRowMapper<>(SHOP_META, ShopMeta.class);
     }
 
-
-    @Override
-    public void save(ShopMeta shopMeta) throws DaoException {
-        save(shopMeta.getPartyId(), shopMeta.getShopId(), shopMeta.getHasPaymentInstitutionAccPayTool());
-    }
-
     @Override
     public void save(String partyId, String shopId, boolean hasPaymentInstitutionAccPayTool) throws DaoException {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -51,7 +45,7 @@ public class ShopMetaDaoImpl extends AbstractGenericDao implements ShopMetaDao {
 
     @Override
     public void save(String partyId, String shopId, int calendarId, int schedulerId,
-                     boolean hasPaymentInstitutionAccPayoutTool) throws DaoException {
+                     String payoutScheduleId) throws DaoException {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
         Query query = getDslContext().insertInto(SHOP_META)
@@ -60,31 +54,12 @@ public class ShopMetaDaoImpl extends AbstractGenericDao implements ShopMetaDao {
                 .set(SHOP_META.CALENDAR_ID, calendarId)
                 .set(SHOP_META.SCHEDULER_ID, schedulerId)
                 .set(SHOP_META.WTIME, now)
-                .set(SHOP_META.HAS_PAYMENT_INSTITUTION_ACC_PAY_TOOL, hasPaymentInstitutionAccPayoutTool)
+                .set(SHOP_META.PAYOUT_SCHEDULE_ID, payoutScheduleId)
                 .onDuplicateKeyUpdate()
                 .set(SHOP_META.CALENDAR_ID, calendarId)
                 .set(SHOP_META.SCHEDULER_ID, schedulerId)
                 .set(SHOP_META.WTIME, now)
-                .set(SHOP_META.HAS_PAYMENT_INSTITUTION_ACC_PAY_TOOL, hasPaymentInstitutionAccPayoutTool);
-
-        executeOne(query);
-    }
-
-    @Override
-    public void save(String partyId, String shopId, int schedulerId, boolean hasPaymentInstitutionAccPayoutTool)
-            throws DaoException {
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-
-        Query query = getDslContext().insertInto(SHOP_META)
-                .set(SHOP_META.PARTY_ID, partyId)
-                .set(SHOP_META.SHOP_ID, shopId)
-                .set(SHOP_META.SCHEDULER_ID, schedulerId)
-                .set(SHOP_META.WTIME, now)
-                .set(SHOP_META.HAS_PAYMENT_INSTITUTION_ACC_PAY_TOOL, hasPaymentInstitutionAccPayoutTool)
-                .onDuplicateKeyUpdate()
-                .set(SHOP_META.SCHEDULER_ID, schedulerId)
-                .set(SHOP_META.WTIME, now)
-                .set(SHOP_META.HAS_PAYMENT_INSTITUTION_ACC_PAY_TOOL, hasPaymentInstitutionAccPayoutTool);
+                .set(SHOP_META.PAYOUT_SCHEDULE_ID, payoutScheduleId);
 
         executeOne(query);
     }
@@ -98,40 +73,11 @@ public class ShopMetaDaoImpl extends AbstractGenericDao implements ShopMetaDao {
     }
 
     @Override
-    public ShopMeta getExclusive(String partyId, String shopId) throws DaoException {
-        Query query = getDslContext().selectFrom(SHOP_META)
-                .where(SHOP_META.PARTY_ID.eq(partyId)
-                        .and(SHOP_META.SHOP_ID.eq(shopId)))
-                .forUpdate();
-
-        return fetchOne(query, shopMetaRowMapper);
-    }
-
-    @Override
-    public List<ShopMeta> getByCalendarAndSchedulerId(int calendarId, int schedulerId) throws DaoException {
-        Query query = getDslContext().selectFrom(SHOP_META)
-                .where(
-                        SHOP_META.CALENDAR_ID.eq(calendarId)
-                                .and(SHOP_META.SCHEDULER_ID.eq(schedulerId))
-                );
-
-        return fetch(query, shopMetaRowMapper);
-    }
-
-    @Override
-    public List<ShopMeta> getAllActiveShops() throws DaoException {
-        Query query = getDslContext().selectFrom(SHOP_META)
-                .where(SHOP_META.SCHEDULER_ID.isNotNull()
-                        .and(SHOP_META.CALENDAR_ID.isNotNull()));
-
-        return fetch(query, shopMetaRowMapper);
-    }
-
-    @Override
     public void disableShop(String partyId, String shopId) throws DaoException {
         Query query = getDslContext().update(SHOP_META)
-                .set(SHOP_META.CALENDAR_ID, (Integer) null)
-                .set(SHOP_META.SCHEDULER_ID, (Integer) null)
+                .setNull(SHOP_META.CALENDAR_ID)
+                .setNull(SHOP_META.SCHEDULER_ID)
+                .setNull(SHOP_META.PAYOUT_SCHEDULE_ID)
                 .where(SHOP_META.PARTY_ID.eq(partyId)
                         .and(SHOP_META.SHOP_ID.eq(shopId)));
 

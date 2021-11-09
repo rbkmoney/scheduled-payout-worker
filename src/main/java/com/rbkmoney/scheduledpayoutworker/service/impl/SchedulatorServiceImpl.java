@@ -60,19 +60,17 @@ public class SchedulatorServiceImpl implements SchedulatorService {
         }
 
         CalendarRef calendarRef = paymentInstitution.getCalendar();
-
-        shopMetaDao.save(partyId, shopId, calendarRef.getId(), scheduleRef.getId(), true);
         Schedule schedule = new Schedule();
         DominantBasedSchedule dominantBasedSchedule = new DominantBasedSchedule()
                 .setBusinessScheduleRef(new BusinessScheduleRef().setId(scheduleRef.getId()))
                 .setCalendarRef(calendarRef);
         schedule.setDominantSchedule(dominantBasedSchedule);
 
-        String jobId = generatePayoutScheduleId(partyId, shopId, scheduleRef.getId());
+        String payoutScheduleId = generatePayoutScheduleId(partyId, shopId, scheduleRef.getId());
         ScheduledJobContext context = new ScheduledJobContext();
         context.setPartyId(partyId);
         context.setShopId(shopId);
-        context.setJobId(jobId);
+        context.setJobId(payoutScheduleId);
 
         RegisterJobRequest registerJobRequest = new RegisterJobRequest()
                 .setSchedule(schedule)
@@ -80,10 +78,12 @@ public class SchedulatorServiceImpl implements SchedulatorService {
                 .setContext(scheduledJobSerializer.writeByte(context));
 
         try {
-            schedulatorClient.registerJob(jobId, registerJobRequest);
+            schedulatorClient.registerJob(payoutScheduleId, registerJobRequest);
         } catch (TException e) {
-            throw new IllegalStateException(String.format("Register job '%s' failed", jobId), e);
+            throw new IllegalStateException(String.format("Register job '%s' failed", payoutScheduleId), e);
         }
+
+        shopMetaDao.save(partyId, shopId, calendarRef.getId(), scheduleRef.getId(), payoutScheduleId);
 
         log.info("Create job request have been successfully sent, " +
                         "partyId='{}', shopId='{}', calendarRef='{}', scheduleRef='{}'",
@@ -96,9 +96,9 @@ public class SchedulatorServiceImpl implements SchedulatorService {
         ShopMeta shopMeta = shopMetaDao.get(partyId, shopId);
         log.info("Trying to deregister job, partyId='{}', shopId='{}'", partyId, shopId);
         shopMetaDao.disableShop(partyId, shopId);
-        if (shopMeta.getSchedulerId() != null) {
+        if (shopMeta.getPayoutScheduleId() != null) {
             try {
-                schedulatorClient.deregisterJob(String.valueOf(shopMeta.getSchedulerId()));
+                schedulatorClient.deregisterJob(shopMeta.getPayoutScheduleId());
             } catch (TException e) {
                 throw new IllegalStateException(
                         String.format("Deregister job '%s' failed", shopMeta.getSchedulerId()), e);

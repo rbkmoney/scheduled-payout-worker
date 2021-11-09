@@ -82,7 +82,7 @@ class SchedulatorServiceTest {
         verify(partyManagementService, times(1)).getPaymentInstitutionRef(partyId, shop.getContractId());
         verify(dominantService, times(1)).getPaymentInstitution(institutionRef);
         verify(shopMetaDao, times(1))
-                .save(partyId, shopId, paymentInstitution.getCalendar().getId(), businessScheduleRef.getId(), true);
+                .save(partyId, shopId, paymentInstitution.getCalendar().getId(), businessScheduleRef.getId(), "zzz");
         verify(shopMetaDao, times(1)).get(partyId, shopId);
         verify(shopMetaDao, times(1)).disableShop(partyId, shopId);
         verify(schedulatorClient, times(1)).deregisterJob(String.valueOf(shopMeta.getSchedulerId()));
