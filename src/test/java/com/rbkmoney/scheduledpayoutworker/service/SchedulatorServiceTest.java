@@ -7,6 +7,7 @@ import com.rbkmoney.scheduledpayoutworker.dao.ShopMetaDao;
 import com.rbkmoney.scheduledpayoutworker.model.ScheduledJobContext;
 import com.rbkmoney.scheduledpayoutworker.serde.impl.ScheduledJobSerializer;
 import com.rbkmoney.scheduledpayoutworker.service.impl.SchedulatorServiceImpl;
+import com.rbkmoney.scheduledpayoutworker.util.GenerateUtil;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,10 +83,11 @@ class SchedulatorServiceTest {
         verify(partyManagementService, times(1)).getPaymentInstitutionRef(partyId, shop.getContractId());
         verify(dominantService, times(1)).getPaymentInstitution(institutionRef);
         verify(shopMetaDao, times(1))
-                .save(partyId, shopId, paymentInstitution.getCalendar().getId(), businessScheduleRef.getId(), "zzz");
+                .save(partyId, shopId, paymentInstitution.getCalendar().getId(), businessScheduleRef.getId(),
+                        GenerateUtil.generatePayoutScheduleId(partyId, shopId, businessScheduleRef.getId()));
         verify(shopMetaDao, times(1)).get(partyId, shopId);
         verify(shopMetaDao, times(1)).disableShop(partyId, shopId);
-        verify(schedulatorClient, times(1)).deregisterJob(String.valueOf(shopMeta.getSchedulerId()));
+        verify(schedulatorClient, times(1)).deregisterJob(String.valueOf(shopMeta.getPayoutScheduleId()));
         verify(scheduledJobSerializer, times(1)).writeByte(scheduledJobContextCaptor.capture());
         ScheduledJobContext context = scheduledJobContextCaptor.getValue();
         verify(schedulatorClient, times(1)).registerJob(eq(context.getJobId()), notNull());
@@ -103,7 +105,7 @@ class SchedulatorServiceTest {
 
         verify(shopMetaDao, times(1)).get(partyId, shopId);
         verify(shopMetaDao, times(1)).disableShop(partyId, shopId);
-        verify(schedulatorClient, times(1)).deregisterJob(String.valueOf(shopMeta.getSchedulerId()));
+        verify(schedulatorClient, times(1)).deregisterJob(String.valueOf(shopMeta.getPayoutScheduleId()));
 
     }
 
