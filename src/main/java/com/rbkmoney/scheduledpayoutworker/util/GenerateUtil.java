@@ -3,7 +3,7 @@ package com.rbkmoney.scheduledpayoutworker.util;
 public class GenerateUtil {
 
     public static String generatePayoutScheduleId(String partyId, String shopId, int scheduleId) {
-        return "payouter-" + partyId + "-" + shopId + "-" + scheduleId;
+        return String.join("-","payouter", partyId, shopId, String.valueOf(scheduleId));
     }
 
     private GenerateUtil() {

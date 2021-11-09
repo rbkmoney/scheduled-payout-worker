@@ -1,0 +1,1 @@
+alter table pt.shop_meta add column payout_schedule_id CHARACTER VARYING;
