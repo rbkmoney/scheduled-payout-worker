@@ -75,7 +75,8 @@ class SchedulatorServiceTest {
         BusinessScheduleRef businessScheduleRef = prepareBusinessScheduleRef();
         ShopMeta shopMeta = new ShopMeta();
         shopMeta.setSchedulerId(generateRandomIntId());
-        shopMeta.setPayoutScheduleId(GenerateUtil.generatePayoutScheduleId(partyId, shopId, businessScheduleRef.getId()));
+        String payoutScheduleId = GenerateUtil.generatePayoutScheduleId(partyId, shopId, businessScheduleRef.getId());
+        shopMeta.setPayoutScheduleId(payoutScheduleId);
         shopMeta.setHasPaymentInstitutionAccPayTool(true);
 
         when(shopMetaDao.get(partyId, shopId)).thenReturn(shopMeta);
@@ -85,7 +86,7 @@ class SchedulatorServiceTest {
         verify(dominantService, times(1)).getPaymentInstitution(institutionRef);
         verify(shopMetaDao, times(1))
                 .save(partyId, shopId, paymentInstitution.getCalendar().getId(), businessScheduleRef.getId(),
-                        GenerateUtil.generatePayoutScheduleId(partyId, shopId, businessScheduleRef.getId()));
+                        payoutScheduleId);
         verify(shopMetaDao, times(1)).get(partyId, shopId);
         verify(shopMetaDao, times(1)).disableShop(partyId, shopId);
         verify(schedulatorClient, times(1)).deregisterJob(shopMeta.getPayoutScheduleId());
