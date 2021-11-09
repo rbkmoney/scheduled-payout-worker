@@ -84,7 +84,7 @@ class ShopCreatedHandlerTest {
         handler.handle(change, event);
         verify(partyManagementService, times(1))
                 .getParty(partyId);
-        verify(shopMetaDao, times(1)).save(partyId, shopId, true);
+        verify(shopMetaDao, times(1)).update(partyId, shopId, true);
     }
 
 

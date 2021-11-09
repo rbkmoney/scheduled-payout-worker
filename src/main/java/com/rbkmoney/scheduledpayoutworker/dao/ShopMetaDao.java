@@ -6,13 +6,13 @@ import com.rbkmoney.scheduledpayoutworker.exception.DaoException;
 
 public interface ShopMetaDao extends GenericDao {
 
-    void save(String partyId, String shopId, boolean hasPaymentInstitutionAccPayoutTool) throws DaoException;
+    void update(String partyId, String shopId, boolean hasPaymentInstitutionAccPayoutTool) throws DaoException;
 
-    void save(String partyId,
-              String shopId,
-              int calendarId,
-              int schedulerId,
-              String payoutScheduleId) throws DaoException;
+    void update(String partyId,
+                String shopId,
+                int calendarId,
+                int schedulerId,
+                String payoutScheduleId) throws DaoException;
 
     ShopMeta get(String partyId, String shopId) throws DaoException;
 

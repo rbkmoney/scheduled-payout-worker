@@ -49,7 +49,7 @@ public class ContractPayoutToolInfoChangedHandler implements PartyManagementHand
         boolean hasPaymentInstitutionAccPayTool =
                 contractEffect.getEffect().getPayoutToolInfoChanged().getInfo().isSetPaymentInstitutionAccount();
         if (hasPaymentInstitutionAccPayTool || shopMetaDao.get(partyId, shopId) != null) {
-            shopMetaDao.save(partyId, shopId, hasPaymentInstitutionAccPayTool);
+            shopMetaDao.update(partyId, shopId, hasPaymentInstitutionAccPayTool);
             log.info("Shop have been saved, partyId={}, shopId={}", partyId, shopId);
         }
     }

@@ -28,7 +28,7 @@ public class ShopMetaDaoImpl extends AbstractGenericDao implements ShopMetaDao {
     }
 
     @Override
-    public void save(String partyId, String shopId, boolean hasPaymentInstitutionAccPayTool) throws DaoException {
+    public void update(String partyId, String shopId, boolean hasPaymentInstitutionAccPayTool) throws DaoException {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
         Query query = getDslContext().insertInto(SHOP_META)
@@ -44,22 +44,17 @@ public class ShopMetaDaoImpl extends AbstractGenericDao implements ShopMetaDao {
     }
 
     @Override
-    public void save(String partyId, String shopId, int calendarId, int schedulerId,
-                     String payoutScheduleId) throws DaoException {
+    public void update(String partyId, String shopId, int calendarId, int schedulerId,
+                       String payoutScheduleId) throws DaoException {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
-        Query query = getDslContext().insertInto(SHOP_META)
-                .set(SHOP_META.PARTY_ID, partyId)
-                .set(SHOP_META.SHOP_ID, shopId)
+        Query query = getDslContext().update(SHOP_META)
                 .set(SHOP_META.CALENDAR_ID, calendarId)
                 .set(SHOP_META.SCHEDULER_ID, schedulerId)
                 .set(SHOP_META.WTIME, now)
                 .set(SHOP_META.PAYOUT_SCHEDULE_ID, payoutScheduleId)
-                .onDuplicateKeyUpdate()
-                .set(SHOP_META.CALENDAR_ID, calendarId)
-                .set(SHOP_META.SCHEDULER_ID, schedulerId)
-                .set(SHOP_META.WTIME, now)
-                .set(SHOP_META.PAYOUT_SCHEDULE_ID, payoutScheduleId);
+                .where(SHOP_META.PARTY_ID.eq(partyId)
+                        .and(SHOP_META.SHOP_ID.eq(shopId)));
 
         executeOne(query);
     }

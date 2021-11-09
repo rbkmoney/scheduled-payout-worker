@@ -20,13 +20,13 @@ class ShopMetaDaoTest extends AbstractPostgreTestContainerConfig {
         String partyId = "partyId";
         String shopId = "shopId";
 
-        shopMetaDao.save(partyId, shopId, true);
+        shopMetaDao.update(partyId, shopId, true);
         ShopMeta shopMeta = shopMetaDao.get(partyId, shopId);
 
-        shopMetaDao.save(partyId, shopId, true);
+        shopMetaDao.update(partyId, shopId, true);
         assertTrue(shopMeta.getWtime().isBefore(shopMetaDao.get(partyId, shopId).getWtime()));
 
-        shopMetaDao.save(partyId, shopId, 1, 2, "zzz");
+        shopMetaDao.update(partyId, shopId, 1, 2, "zzz");
         shopMeta = shopMetaDao.get(partyId, shopId);
 
         assertEquals(partyId, shopMeta.getPartyId());
@@ -35,14 +35,14 @@ class ShopMetaDaoTest extends AbstractPostgreTestContainerConfig {
         assertEquals(2, (int) shopMeta.getSchedulerId());
         assertEquals("zzz", shopMeta.getPayoutScheduleId());
 
-        shopMetaDao.save(partyId, shopId, 2, 1, "zzz");
+        shopMetaDao.update(partyId, shopId, 2, 1, "zzz");
         shopMeta = shopMetaDao.get(partyId, shopId);
         assertEquals(partyId, shopMeta.getPartyId());
         assertEquals(shopId, shopMeta.getShopId());
         assertEquals(2, (int) shopMeta.getCalendarId());
         assertEquals(1, (int) shopMeta.getSchedulerId());
 
-        shopMetaDao.save("test2", "test2", 2, 1, "ccc");
+        shopMetaDao.update("test2", "test2", 2, 1, "ccc");
 
         shopMetaDao.disableShop(partyId, shopId);
         shopMeta = shopMetaDao.get(partyId, shopId);

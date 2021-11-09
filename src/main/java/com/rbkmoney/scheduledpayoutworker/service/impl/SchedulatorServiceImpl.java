@@ -83,7 +83,7 @@ public class SchedulatorServiceImpl implements SchedulatorService {
             throw new IllegalStateException(String.format("Register job '%s' failed", payoutScheduleId), e);
         }
 
-        shopMetaDao.save(partyId, shopId, calendarRef.getId(), scheduleRef.getId(), payoutScheduleId);
+        shopMetaDao.update(partyId, shopId, calendarRef.getId(), scheduleRef.getId(), payoutScheduleId);
 
         log.info("Create job request have been successfully sent, " +
                         "partyId='{}', shopId='{}', calendarRef='{}', scheduleRef='{}'",

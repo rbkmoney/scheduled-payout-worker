@@ -73,7 +73,7 @@ class ShopPayoutToolChangedHandlerTest {
         verify(partyManagementService, times(1))
                 .getParty(partyId);
         verify(shopMetaDao, times(1)).get(partyId, shopId);
-        verify(shopMetaDao, times(1)).save(partyId, shopId, false);
+        verify(shopMetaDao, times(1)).update(partyId, shopId, false);
     }
 
 
