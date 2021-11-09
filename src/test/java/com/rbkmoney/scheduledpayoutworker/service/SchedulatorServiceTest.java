@@ -100,7 +100,7 @@ class SchedulatorServiceTest {
         String partyId = generateRandomStringId();
         String shopId = generateRandomStringId();
         ShopMeta shopMeta = new ShopMeta();
-        shopMeta.setSchedulerId(generateRandomIntId());
+        shopMeta.setPayoutScheduleId(generateRandomStringId());
         when(shopMetaDao.get(partyId, shopId)).thenReturn(shopMeta);
 
         service.deregisterJob(partyId, shopId);
