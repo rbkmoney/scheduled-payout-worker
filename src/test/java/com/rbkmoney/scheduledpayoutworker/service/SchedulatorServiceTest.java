@@ -72,12 +72,13 @@ class SchedulatorServiceTest {
         PaymentInstitution paymentInstitution = preparePaymentInstitution();
         when(dominantService.getPaymentInstitution(institutionRef)).thenReturn(paymentInstitution);
 
+        BusinessScheduleRef businessScheduleRef = prepareBusinessScheduleRef();
         ShopMeta shopMeta = new ShopMeta();
         shopMeta.setSchedulerId(generateRandomIntId());
+        shopMeta.setPayoutScheduleId(GenerateUtil.generatePayoutScheduleId(partyId, shopId, businessScheduleRef.getId()));
         shopMeta.setHasPaymentInstitutionAccPayTool(true);
 
         when(shopMetaDao.get(partyId, shopId)).thenReturn(shopMeta);
-        BusinessScheduleRef businessScheduleRef = prepareBusinessScheduleRef();
         service.registerJob(partyId, shopId, businessScheduleRef);
         verify(partyManagementService, times(1)).getShop(partyId, shopId);
         verify(partyManagementService, times(1)).getPaymentInstitutionRef(partyId, shop.getContractId());
@@ -87,7 +88,7 @@ class SchedulatorServiceTest {
                         GenerateUtil.generatePayoutScheduleId(partyId, shopId, businessScheduleRef.getId()));
         verify(shopMetaDao, times(1)).get(partyId, shopId);
         verify(shopMetaDao, times(1)).disableShop(partyId, shopId);
-        verify(schedulatorClient, times(1)).deregisterJob(String.valueOf(shopMeta.getPayoutScheduleId()));
+        verify(schedulatorClient, times(1)).deregisterJob(shopMeta.getPayoutScheduleId());
         verify(scheduledJobSerializer, times(1)).writeByte(scheduledJobContextCaptor.capture());
         ScheduledJobContext context = scheduledJobContextCaptor.getValue();
         verify(schedulatorClient, times(1)).registerJob(eq(context.getJobId()), notNull());
@@ -105,7 +106,7 @@ class SchedulatorServiceTest {
 
         verify(shopMetaDao, times(1)).get(partyId, shopId);
         verify(shopMetaDao, times(1)).disableShop(partyId, shopId);
-        verify(schedulatorClient, times(1)).deregisterJob(String.valueOf(shopMeta.getPayoutScheduleId()));
+        verify(schedulatorClient, times(1)).deregisterJob(shopMeta.getPayoutScheduleId());
 
     }
 
