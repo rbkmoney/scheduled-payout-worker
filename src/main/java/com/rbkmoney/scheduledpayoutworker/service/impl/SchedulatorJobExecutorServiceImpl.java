@@ -65,23 +65,21 @@ public class SchedulatorJobExecutorServiceImpl implements ScheduledJobExecutorSr
             ShopMeta shopMeta = shopMetaDao.get(scheduledJobContext.getPartyId(), scheduledJobContext.getShopId());
             String partyId = shopMeta.getPartyId();
             String shopId = shopMeta.getShopId();
-            log.info(
-                    "Trying to create payout for shop, partyId='{}', shopId='{}', scheduledJobContext='{}'",
+            log.info("Trying to create payout for shop, partyId='{}', shopId='{}', scheduledJobContext='{}'",
                     partyId, shopId, scheduledJobContext);
 
             try {
                 LocalDateTime toTime = stringToLocalDateTime(
                         executeJobRequest.getScheduledJobContext().getNextCronTime());
 
-                String payoutId = payoutManagerService.createPayoutByRange(
-                        partyId,
-                        shopId,
-                        toTime
-                );
-                log.info(
-                        "Payout for shop have been successfully created, payoutId='{}' partyId='{}'," +
-                                " shopId='{}', scheduledJobContext='{}'",
-                        payoutId, partyId, shopId, scheduledJobContext);
+                String payoutId = payoutManagerService.createPayoutByRange(partyId, shopId, toTime);
+                if (payoutId == null) {
+                    log.info("Payout couldn't be created, amount = 0");
+                } else {
+                    log.info("Payout for shop have been successfully created, payoutId='{}' partyId='{}'," +
+                                    " shopId='{}', scheduledJobContext='{}'",
+                            payoutId, partyId, shopId, scheduledJobContext);
+                }
             } catch (NotFoundException | InvalidStateException ex) {
                 log.warn(
                         "Failed to generate payout, partyId='{}', shopId='{}', scheduledJobContext='{}'," +

@@ -27,6 +27,7 @@ import java.util.UUID;
 @Slf4j
 public class PayoutManagerServiceImpl implements PayoutManagerService {
 
+    public static final int MAX_DAYS = 7;
     private final PaymentDao paymentDao;
     private final RefundDao refundDao;
     private final AdjustmentDao adjustmentDao;
@@ -36,6 +37,10 @@ public class PayoutManagerServiceImpl implements PayoutManagerService {
     private final PayoutManagementSrv.Iface payoutManagerClient;
     private final PartyManagementService partyManagementService;
 
+    /**
+     * Create payout by partyId, shopId and toTime. fromTime = toTime - MAX_DAYS
+     * @return payoutId if payout successfully created, null if payout amount = 0
+     */
     @Override
     @Transactional
     public String createPayoutByRange(String partyId, String shopId, LocalDateTime toTime)
@@ -50,10 +55,13 @@ public class PayoutManagerServiceImpl implements PayoutManagerService {
         }
 
         String payoutId = UUID.randomUUID().toString();
-        LocalDateTime fromTime = toTime.minusDays(7);
+        LocalDateTime fromTime = toTime.minusDays(MAX_DAYS);
         includeUnpaid(payoutId, partyId, shopId, fromTime, toTime);
 
         long amount = calculateAvailableAmount(payoutId);
+        if (amount == 0) {
+            return null;
+        }
 
         String symbolicCode = shop.getAccount().getCurrency().getSymbolicCode();
         CurrencyRef currency = new CurrencyRef().setSymbolicCode(symbolicCode);
